@@ -2,4 +2,6 @@
 **/out/
 *.class
 /mysql-connector-j-9.6.0/
-/.git-nested-hold/
+.env
+.env.*
+!.env.example
