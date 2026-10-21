@@ -1,0 +1,110 @@
+TRAVEL AND TOURISM MANAGEMENT SYSTEM
+INTERVIEW PREPARATION NOTES
+
+PROJECT SUMMARY
+This is a desktop travel and tourism management application built in Java. It uses Java Swing for its graphical user interface and MySQL for persistent storage. The application connects to MySQL through JDBC using the MySQL Connector/J driver.
+
+WHAT THE APPLICATION DOES
+- Lets users sign up, log in, and recover an account using a security question.
+- Stores customer details and supports viewing, updating, and deleting them.
+- Shows travel packages and lets a user make a package booking.
+- Lists hotels, estimates hotel booking costs, and records hotel bookings.
+- Displays customer and booking details in the application.
+- Includes a payment screen that opens a Paytm web page; this project does not implement a payment gateway API.
+
+TECHNOLOGY STACK
+- Language: Java
+- Desktop UI: Java Swing (JFrame, labels, buttons, text fields, combo boxes, and tables)
+- Database: MySQL
+- Database connectivity: JDBC
+- Driver: MySQL Connector/J (the project includes mysql-connector-j-9.6.0.jar)
+- SQL: DDL for tables, sample hotel data, and DML queries for login, customer records, and bookings
+- IDE metadata: IntelliJ IDEA project file is included
+
+DATABASE DETAILS
+- Database name used by the JDBC URL: travelmanagementsystem
+- MySQL host/port in the code: localhost:3306
+- Connection class: src/Conn.java
+- DB username: read from DB_USER; defaults to root if DB_USER is unset.
+- DB password: read from the DB_PASSWORD environment variable. The password is not stored in the source code.
+
+TABLES IN THE SQL SCRIPT
+1. account
+   Fields: username, name, password, security, answer.
+   Holds account/login information and the security question response.
+
+2. customer
+   Fields: username, id, number, name, gender, country, address, phone, email.
+   Holds the user's customer profile. The SQL script declares a foreign key from customer.username to account.username.
+
+3. bookpackage
+   Fields: username, package, persons, id, number, phone, price.
+   Holds package booking information.
+
+4. hotel
+   Fields: name, costperperson, acroom, foodcharged.
+   Holds hotel names and base cost components. The SQL script inserts sample hotels.
+
+5. bookhotel
+   Fields: username, name, persons, days, ac, food, id, number, phone, price.
+   Holds hotel booking selections and calculated price information.
+
+BASIC DATA FLOW
+1. Conn loads the MySQL JDBC driver and opens a connection to travelmanagementsystem.
+2. Screens collect input through Swing controls.
+3. Java code sends SQL queries through JDBC Statement objects.
+4. SELECT queries return ResultSet data for login checks, profile lookup, hotel lookup, and booking views.
+5. INSERT, UPDATE, and DELETE statements change account, customer, and booking data.
+
+A SHORT INTERVIEW INTRODUCTION
+“My project is a Java Swing desktop application for travel and tourism management. It connects to a MySQL database with JDBC and MySQL Connector/J. Users can manage customer profiles, browse travel packages and hotels, make bookings, and view booking records. The database has account, customer, hotel, package-booking, and hotel-booking tables. Database connection credentials are read from environment variables rather than hardcoded in the source.”
+
+POSSIBLE INTERVIEW QUESTIONS AND ANSWERS
+
+Q: Why did you use MySQL?
+A: The application stores structured records such as accounts, customers, hotels, and bookings. MySQL provides relational tables and SQL queries for storing and retrieving that data.
+
+Q: How does Java connect to MySQL?
+A: The application uses JDBC. Conn.java loads com.mysql.cj.jdbc.Driver and uses DriverManager.getConnection with the database URL and credentials from environment variables.
+
+Q: What is JDBC?
+A: JDBC is Java's standard API for connecting to databases, executing SQL, and reading results. It provides interfaces such as Connection, Statement, and ResultSet.
+
+Q: What is the purpose of a ResultSet?
+A: A ResultSet contains rows returned by a query. The application reads it to check login details, load customer or hotel data, and display bookings.
+
+Q: What is a foreign key in this schema?
+A: The customer table declares username as a foreign key referencing account.username. This is intended to link a customer profile to an account and support referential integrity.
+
+Q: What is the difference between a primary key and a foreign key?
+A: A primary key uniquely identifies a row in its table. A foreign key refers to a key in another table and enforces a relationship between the tables.
+
+Q: How is the database password kept out of source control?
+A: Conn.java reads it from the DB_PASSWORD environment variable. Local .env files are ignored by Git; the real credential should be configured on the machine running the app and never committed.
+
+Q: What is one security improvement you would make?
+A: Replace SQL built by concatenating user input with PreparedStatement parameters. This helps prevent SQL injection. I would also store application passwords as salted hashes and avoid storing security-question answers in plain text.
+
+Q: What database design improvements would you make?
+A: Add primary keys to every table, make account.username a primary or unique key before referencing it, and add foreign keys from booking tables to their related account, customer, and hotel records. Store prices and counts using numeric types instead of VARCHAR, and define appropriate NOT NULL and UNIQUE constraints.
+
+Q: How would you make multi-step updates reliable?
+A: Use a JDBC transaction: disable auto-commit, execute all related statements, commit if all succeed, and roll back if any statement fails.
+
+Q: Does the application process real payments?
+A: The payment screen opens the Paytm website in an embedded browser component. The project does not show an integration with a payment gateway API, so I would describe it as a payment link/screen rather than payment processing.
+
+HONEST LIMITATIONS TO MENTION
+- The code currently uses Statement with SQL strings assembled from user input; PreparedStatement would be safer.
+- The account table's password and security-answer fields are stored as ordinary text in this project schema; production software should hash passwords and protect recovery data.
+- The SQL script does not define primary keys, and only customer.username is declared as a foreign key. The schema should be strengthened before production use.
+- Several numeric values such as price, persons, and days are VARCHAR fields and should use numeric SQL types.
+- The database name must exist before the application connects. Create/import the schema using the provided SQL file and configure DB_USER and DB_PASSWORD in the runtime environment.
+
+FILES TO KNOW
+- Travel and Tourisim Management System Project Database SQL.sql: database/table creation and sample hotel rows.
+- Travel  and Torism Management System/src/Conn.java: JDBC connection setup.
+- src/Login.java and src/Signup.java: login and account creation.
+- src/AddCustomer.java, src/UpdateCustomer.java, src/ViewCustomer.java, src/DeleteDetails.java: customer management.
+- src/BookPackage.java and src/ViewPackage.java: package booking and viewing.
+- src/BookHotel.java and src/ViewBookedHotel.java: hotel booking and viewing.
